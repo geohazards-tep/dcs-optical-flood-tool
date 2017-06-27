@@ -506,7 +506,7 @@ class ImageWork():
            # with open(inPath) as f:
            #     pathImages = f.readlines()
            #     pathImages = [x.strip() for x in pathImages]
-           #     x = 0
+        #x = 0
            #     numIm = len(pathImages)
         print '\n'+type + ' : '
         print 'wetCostant1 = ', wetCostant1
@@ -515,14 +515,42 @@ class ImageWork():
         print 'aweiNshCostant = ', aweiNshCostant
         #for pathImage in pathImages:
         pathImage = inPath
+	print 'path image: ', pathImage
 	imageIn = self.buildeVirtualStackImage(pathImage)
+	#print 'imageIn: ', imageIn
+	
         image = imageIn[0]
+	print 'nir'
+	print image[3]['array'].max()
+	print image[3]['array'].min()
+	
+	print 'blue'
+        print image[0]['array'].max()
+        print image[0]['array'].min()
+
+	print 'green'
+        print image[1]['array'].max()
+        print image[1]['array'].min()
+
+	print 'red'
+        print image[2]['array'].max()
+        print image[2]['array'].min()
+
+        print 'swir1'
+        print image[4]['array'].max()
+        print image[4]['array'].min()
+
+        print 'swir2'
+        print image[5]['array'].max()
+        print image[5]['array'].min()
+
+
         imageOutput = imageIn[1]
-                  
+        print "nome uscita: ", imageOutput         
         if not(image is None):
-        	x+=1
+        	#x+=1
                 outNameImage = imageOutput[0]
-                print '\n\nSTART INPORT IMAGE NUM %d ON %d \n\n' % (x,numIm)
+                print '\n\nSTART INPORT IMAGE' 
                 print 'Name outFile : ', outNameImage
                 nir = image[3]
                 print '\n\nFINE INPORT NIR', nir['array'].shape
@@ -643,7 +671,8 @@ class ImageWork():
                 r = None
                 s1 = None
                 s2 = None
-                print '\n WORKED %d IMAGES ON %d' % (x, numIm)
+                print '\n WORKED IMAGE'
+		return outNameImage
 
     # BOOLEANE FUNCTION #
 
@@ -954,7 +983,7 @@ class ImageWork():
 
 
 
-def water_OpticalSat_detection_body(image_list=None, type_sat=None, window=None, outdir=None, smallest_flood_pixels=None, proc_param=None):
+def water_OpticalSat_detection_body(image_folder=None, type_sat=None, window=None, outdir=None, smallest_flood_pixels=None, proc_param=None):
     
     cc=window.split()
     if not cc==[]:
@@ -970,7 +999,7 @@ def water_OpticalSat_detection_body(image_list=None, type_sat=None, window=None,
 
     print type_sat
     satData = ImageWork(type_sat)
-    satData.waterDetection(image_list, outdir, proc_param)
+    return satData.waterDetection(image_folder, outdir, proc_param)
 
 
 
@@ -979,12 +1008,12 @@ def water_OpticalSat_detection_body(image_list=None, type_sat=None, window=None,
 def water_OpticalSat_detection_main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--image_list", default="", type=str, help="optical image list")
+    parser.add_argument("-i", "--image_folder", default="", type=str, help="optical image folder")
     parser.add_argument("-t", "--type_sat", default="S2R", type=str, help="Sensor type: it can be S2R for Sentinel2 and L8R for Landsat-8")
     parser.add_argument("-w", "--window", default="", type=str, help="AOI for analysis")
     parser.add_argument("-o", "--outdir", default="", type=str, help="output directory")
     parser.add_argument("-s", "--smallest_flood_pixels", default="9", type=int, help="minimum size for flood areas")
-    parser.add_argument("-p", "--proc_param", default="", type=str, help="minimum size for flood areas")
+    parser.add_argument("-p", "--proc_param", default="", type=str, help="miscellaneous")
 
 
     kwargs = vars(parser.parse_args())
@@ -995,9 +1024,8 @@ def water_OpticalSat_detection_main():
 
 
 
-
 if __name__ == '__main__':
     water_OpticalSat_detection_main()
 
 
-##riga di lancio:  water_OpticalSat_detection.py --image_list lista_immagini.txt --type_sat 'S2R' --window 'xmin ymin xdim ydim' --outdir=./ --proc_param='8 8 0.20 0.25'
+##riga di lancio:  water_OpticalSat_detection.py --image_folder image_folder  --type_sat 'S2R' --window 'xmin ymin xdim ydim' --outdir=./ --proc_param='8 8 0.20 0.25'

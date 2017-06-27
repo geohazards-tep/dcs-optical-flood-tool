@@ -36,10 +36,10 @@ def clean_exit(exit_code):
 def main():
     outdir=ciop.tmp_dir
     input = sys.stdin.readlines()
-    print input
+    print "il file di input e': ", input
     try:
 	input_file = input[0][string.find(input[0], "'")+1:string.rfind(input[0],"'")]    
-        print input_file
+        print "input file pulito dall a capo: ",input_file
     #print "sys.stdin ", input
     #for input in sys.stdin:
     #print "sys.stdin ", input
@@ -47,8 +47,11 @@ def main():
         out, err=process.communicate()
         output_file=ciop.copy(out,outdir, extract=False)
         print output_file
-        res = ciop.publish(output_file, mode='silent', metalink=True)
-        print "ciop.publish result: ", res
+        res = ciop.publish(output_file, metalink=False)
+	print 'result from publish to hdfs: ', res
+	#res = ciop.publish(output_file, mode='silent', metalink=True) 
+	#print 'result from publish string: ', res
+	#subprocess.call(["ls","-l",res])
 	subprocess.call(["ls","-l",output_file])
     except:
 	print "unexpected error...exiting"

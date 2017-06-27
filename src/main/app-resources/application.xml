@@ -6,7 +6,7 @@
 	 <defaultParameters>
       </defaultParameters>
 	<defaultJobconf>
-	<property id="ciop.job.max.tasks">10</property>
+	<property id="ciop.job.max.tasks">2</property>
         <property id="mapred.task.timeout">9900000000</property>
 	</defaultJobconf>	
     </jobTemplate>
@@ -15,7 +15,7 @@
          <defaultParameters>
       </defaultParameters>
         <defaultJobconf>
-        <property id="ciop.job.max.tasks">10</property>
+        <property id="ciop.job.max.tasks">2</property>
         <property id="mapred.task.timeout">9900000000</property>
         </defaultJobconf>
     </jobTemplate>
@@ -25,7 +25,7 @@
     <node id="node_download">       
       <job id="download"></job>
       <sources>
-        <source refid="string:list" id="input" title="sar images" abstract="optical images to be downloaded" scope="runtime"></source>
+        <source refid="string:list" id="input" title="optical images" abstract="optical images to be downloaded" scope="runtime"></source>
       </sources>
     </node>
     <node id="node_flood_extraction">
