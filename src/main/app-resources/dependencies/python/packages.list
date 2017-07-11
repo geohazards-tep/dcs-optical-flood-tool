@@ -34,7 +34,6 @@ mkl=2017.0.3=0
 netcdf4=1.2.4=np113py27_0
 numpy=1.13.0=py27_0
 openssl=1.0.2h=1
-openjpeg2=2.1.0=py27_0
 packaging=16.8=py27_0
 pil=1.1.7=py27_2
 pip=8.1.2=py27_0
