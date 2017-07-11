@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>e-geos</groupId>
-  <artifactId>optical-flood-tool</artifactId>
+  <artifactId>dcs-optical-flood-tool</artifactId>
   <packaging>pom</packaging>
-  <name>optical-flood-tool</name>
+  <name>dcs-optical-flood-tool</name>
   <parent>
     <groupId>com.terradue</groupId>
     <artifactId>dcs-python-parent</artifactId>
@@ -20,8 +20,8 @@
   </properties>
   <scm>
     <connection>scm:git:ssh://git@github.com/geohazards-tep/optical-flood-tool</connection>
-    <developerConnection>scm:git:ssh://git@github.com/geohazards-tep/optical-flood-tool</developerConnection>
-    <url>https://github.com/geohazards-tep/optical-flood-tool</url>
+    <developerConnection>scm:git:ssh://git@github.com/geohazards-tep/dcs-optical-flood-tool</developerConnection>
+    <url>https://github.com/geohazards-tep/dcs-optical-flood-tool</url>
     <tag>HEAD</tag>
   </scm>
   <profiles>
