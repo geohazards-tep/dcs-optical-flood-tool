@@ -672,7 +672,7 @@ class ImageWork():
                 s1 = None
                 s2 = None
                 print '\n WORKED IMAGE'
-		return outNameImage
+		return outPath+os.sep+outNameImage
 
     # BOOLEANE FUNCTION #
 

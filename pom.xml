@@ -18,7 +18,6 @@
     <community>geohazards-tep</community>
     <yumRepo>geohazards-tep</yumRepo>
   </properties>
-  <require>openjpeg2</require>
   <scm>
     <connection>scm:git:ssh://git@github.com/geohazards-tep/optical-flood-tool</connection>
     <developerConnection>scm:git:ssh://git@github.com/geohazards-tep/dcs-optical-flood-tool</developerConnection>
@@ -49,6 +48,7 @@
                   <!-- Set here the dependencies installed with 'sudo yum install'-->
                   <requires>
                     <require>miniconda</require>
+   	            <require>openjpeg2</require>
                   </requires>
                 </configuration>
               </execution>
