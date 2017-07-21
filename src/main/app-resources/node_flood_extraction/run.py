@@ -87,8 +87,10 @@ def main():
     #flood_file_result = water_OpticalSat_detection.water_OpticalSat_detection_body(image_folder=extract_dir, type_sat=None, outdir=extract_dir, smallest_flood_pixels=9, proc_param='8 8 0.20 0.25')
     sensor_init = filename[0:3].upper()
     sensor_map = {'S2A':'S2R','LC8':'L8R'}
+    param_sat = {'S2A':'8 8 0.20 0.25','LC8':'5 5 0.14 0.14'}
     print "water detection parameter: ", extract_dir, sensor_map[sensor_init], extract_dir
-    flood_file_result = water_OpticalSat_detection.water_OpticalSat_detection_body(image_folder=extract_dir, type_sat=sensor_map[sensor_init], outdir=extract_dir, smallest_flood_pixels=9, proc_param='8 8 0.20 0.25')
+    print "param_sat: ", param_sat[sensor_init]
+    flood_file_result = water_OpticalSat_detection.water_OpticalSat_detection_body(image_folder=extract_dir, type_sat=sensor_map[sensor_init], outdir=extract_dir, smallest_flood_pixels=9, proc_param=param_sat[sensor_init])
 
     #water_OpticalSat_detection --image_folder lista_immagini.txt --type_sat 'S2R' --window 'xmin ymin xdim ydim' --outdir=./ --proc_param='8 8 0.20 0.25'
     print "flood_file_result: ", flood_file_result
