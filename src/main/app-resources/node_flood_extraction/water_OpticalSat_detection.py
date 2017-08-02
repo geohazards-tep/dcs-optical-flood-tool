@@ -21,7 +21,7 @@ class ImageWork():
             tmp['array'] = copy.deepcopy((imageDict['array']).astype(npType))
             tmp['array'][tmp['array'] == self.noData] = np.nan
             self.copyImageProperty(tmp, imageDict)
-            return copy.deepcopy(tmp)
+            return tmp
 
     def nanToNoData(self, imageDict, npType='float32'):
         import numpy as np
@@ -31,7 +31,7 @@ class ImageWork():
             tmp['array'] = copy.deepcopy((imageDict['array']).astype(npType))
             tmp['array'][np.isnan(tmp['array'])] = self.noData
             self.copyImageProperty(tmp, imageDict)
-            return copy.deepcopy(tmp)
+            return tmp
 
     # IMAGE READ/WRITE #
 
@@ -59,7 +59,8 @@ class ImageWork():
         import numpy as np
         import copy
         import os
-        gdalImage = self.getGeoImage(path)
+        print "path into gtNpTOAImage: ", path
+	gdalImage = self.getGeoImage(path)
         gdalBand = gdalImage.GetRasterBand(1)
         transform = gdalImage.GetGeoTransform()
         projection = gdalImage.GetProjection()
@@ -90,8 +91,8 @@ class ImageWork():
         data = self.extractData(imageFile)
         # Updata no data value in array with new value
         rasterArray[rasterArray == noData] = self.noData
-        return copy.deepcopy({'array': rasterArray, 'xSize': gdalBand.XSize, 'ySize': gdalBand.YSize,
-                              'gdalTransform': transform, 'gdalProjection': projection, 'yyyymmdd': data})
+        return {'array': rasterArray, 'xSize': gdalBand.XSize, 'ySize': gdalBand.YSize,
+                              'gdalTransform': transform, 'gdalProjection': projection, 'yyyymmdd': data}
 
     def writeNpBandAsImage(self, dictionaryImage, fileOutName, path='', gdalType='', gdalDrive='GTiff'):
         from osgeo import gdal, gdal_array
@@ -119,8 +120,8 @@ class ImageWork():
 
     def setImageDict(self):
         import copy
-        return copy.deepcopy({'array': None, 'xSize': None, 'ySize': None,
-                              'gdalTransform': None, 'gdalProjection': None, 'yyyymmdd': None})
+        return {'array': None, 'xSize': None, 'ySize': None,
+                              'gdalTransform': None, 'gdalProjection': None, 'yyyymmdd': None}
 
     def copyImageProperty(self, dictionaryImage1, dictionaryImage2):
         if self.is_imageDict(dictionaryImage2) and self.is_imageDict(dictionaryImage1):
@@ -143,18 +144,26 @@ class ImageWork():
         nomeOut = True
         print "buildVirtualStackImage path: ", path
 	if self.satType.upper() == 'S2R':
+	    print "S2 processing!!"
             bands = ['B02','B03','B04','B08','B11','B12']
-            attribute0 = 'S2'
+            attribute0 = 'T'
             attribute1 = '.JP2'
         elif self.satType.upper() == 'L8R':
+	    print "L8 processing!!"
             bands = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7']
             attribute0 = 'LC8'
             attribute1 = '.TIF'
         bandIn = []
         for root, dirs, files in os.walk(path):
             allImageFiles = [x for x in files if attribute0 in x.upper() and x.upper().endswith(attribute1)]
+	    #print "curdir = ", os.curdir
+	    #print "walking in the trees! allImageFiles: ", allImageFiles
+	    #print os.path.abspath(os.curdir)
+	    #print os.__file__
             for band in bands:
-                selectImageFile = [x for x in allImageFiles if band in x.upper()]
+		print "band : ", band
+		selectImageFile = [x for x in allImageFiles if band in x.upper()]
+		print selectImageFile
                 if not selectImageFile == []:
                     bandIn.append(self.getNpTOAImage(root + self.sep +selectImageFile[0]))
                     if nomeOut:
@@ -170,7 +179,7 @@ class ImageWork():
             noJamp = True
             nomeOut = True
         if store == 1:
-            return (copy.deepcopy(bandIn),copy.deepcopy(storeOutName))
+            return (bandIn,storeOutName)
         else:
             return (None,None)
 
@@ -245,7 +254,7 @@ class ImageWork():
                 if 'REFLECTANCE_ADD_BAND_9' in line:
                     result['ADD_B09'] = float(line.strip().split('=')[1].strip())
         fd.close()
-        return copy.deepcopy(result)
+        return result
 
     def setMaskBandInDict(self, file, pathIn):
         maskDict = self.inportDictionary[self.satType]['maskList'][0]
@@ -336,19 +345,19 @@ class ImageWork():
         bandOut['array'] = np.array(bandImageOut.ReadAsArray())
         imageIn = None
         imageOut = None
-        return copy.deepcopy(bandOut)
+        return bandOut
 
         # SUPPORT MATRIX FUNCTION #
 
     def max3Array(self, array1, array2, array3):
         import numpy as np
         import copy
-        return copy.deepcopy(np.fmax(np.fmax(array1, array2), array3))
+        return np.fmax(np.fmax(array1, array2), array3)
 
     def min3Array(self, array1, array2, array3):
         import numpy as np
         import copy
-        return copy.deepcopy(np.fmin(np.fmin(array1, array2), array3))
+        return np.fmin(np.fmin(array1, array2), array3)
 
     # INDEX #
 
@@ -367,7 +376,7 @@ class ImageWork():
                 self.writeNpBandAsImage(self.nanToNoData(ndvi, npType='float32'), nameFile, outPath, gdalType='',
                                         gdalDrive='GTiff')
         if storeImageDictionary:
-            return copy.deepcopy(self.nanToNoData(ndvi, npType='float32'))
+            return self.nanToNoData(ndvi, npType='float32')
         return None
 
     def ndsi(self, green, swir1):
@@ -375,7 +384,7 @@ class ImageWork():
         import copy
         g = self.noDataToNan(green)
         s1 = self.noDataToNan(swir1)
-        return copy.deepcopy(np.divide(np.subtract(g['array'], s1['array']), np.add(g['array'], s1['array'])))
+        return np.divide(np.subtract(g['array'], s1['array']), np.add(g['array'], s1['array']))
 
     def aweiSh(self, blue, green, nir, swir1, swir2):
         import numpy as np
@@ -433,11 +442,19 @@ class ImageWork():
         nx = np.multiply(constN, n['array'])
         s1x = np.multiply(constS1, s1['array'])
         s2x = np.multiply(constS2, s2['array'])
+	step21 = np.subtract(s1x, s2x)
+        s1x=None
+	s2x=None	
         step11 = np.add(bx, gx)
+	bx=None
+	gx=None
         step12 = np.add(rx, nx)
+	rx=None
+	nx=None
         step13 = np.add(step11, step12)
-        step21 = np.subtract(s1x, s2x)
-        return copy.deepcopy(np.subtract(step13, step21))
+	step11 = None
+	step12 = None
+        return np.subtract(step13, step21)
 
         # ANALISYS #
 
@@ -448,13 +465,7 @@ class ImageWork():
         r = self.noDataToNan(red)
         n = self.noDataToNan(nir)
         maxGRN = self.max3Array(g['array'], r['array'], n['array'])
-        return copy.deepcopy \
-                (
-                np.divide
-                    (
-                    np.subtract(maxGRN, self.min3Array(g['array'], r['array'], n['array'])), maxGRN
-                )
-            )
+        return np.divide(np.subtract(maxGRN, self.min3Array(g['array'], r['array'], n['array'])), maxGRN)
 
     def waterDetection(self,inPath, outPath, wetLimitCon=[]):
         '''
@@ -517,7 +528,7 @@ class ImageWork():
         pathImage = inPath
 	print 'path image: ', pathImage
 	imageIn = self.buildeVirtualStackImage(pathImage)
-	#print 'imageIn: ', imageIn
+	print 'imageIn: ', imageIn
 	
         image = imageIn[0]
 	print 'nir'
@@ -690,7 +701,7 @@ class ImageWork():
         step12 = step11 & (difBG >= g['array'])
         step13 = step12 & (difBG >= r['array'])
         step14 = step13 & (difBG >= n['array'])
-        return copy.deepcopy(step14 & (difBG >= s1['array']))
+        return step14 & (difBG >= s1['array'])
 
     def isWatershape2(self, blue, green, red, nir, swir1, swir2):
         import numpy as np
@@ -714,7 +725,7 @@ class ImageWork():
         step17 = step16 & (s1['array'] > s2['array'])
         step21 = const3 < n['array']
         step22 = step21 & (n['array'] < g['array'])
-        return copy.deepcopy(step17 & step22)
+        return step17 & step22
 
     def isSnowshape(self, blue, green, red, nir, swir1):
         import numpy as np
@@ -728,7 +739,7 @@ class ImageWork():
         max = self.min3Array(b['array'], g['array'], r['array'])
         max1 = np.fmin(max, n['array']) > const1
         max2 = self.ndsi(green, swir1) > const2
-        return copy.deepcopy(max1 & max2)
+        return max1 & max2
 
     def isGrowing14(self, blue, green, red, nir):
         import numpy as np
@@ -739,7 +750,7 @@ class ImageWork():
         n = self.noDataToNan(nir)
         step11 = b['array'] < g['array']
         step12 = step11 & (g['array'] < r['array'])
-        return copy.deepcopy(step12 & (r['array'] < n['array']))
+        return step12 & (r['array'] < n['array'])
 
     def isGrowing15(self, blue, green, red, nir, swir1):
         import numpy as np
@@ -752,7 +763,7 @@ class ImageWork():
         step11 = b['array'] < g['array']
         step12 = step11 & (g['array'] < r['array'])
         step13 = step12 & (r['array'] < n['array'])
-        return copy.deepcopy(step13 & (n['array'] < s1['array']))
+        return step13 & (n['array'] < s1['array'])
 
     def isBrightsoil(self, blue, green, red, nir, swir1, swir2):
         import numpy as np
@@ -767,7 +778,7 @@ class ImageWork():
         step21 = step11
         step22 = step21 & self.isGrowing14(blue, green, red, nir)
         step23 = step22 & (np.subtract(s1['array'], s2['array']) > const2)
-        return copy.deepcopy(np.logical_or(step12, step23))
+        return np.logical_or(step12, step23)
 
     def isCloudshape1(self, blue, green, red, nir, swir1):
         import numpy as np
@@ -788,7 +799,7 @@ class ImageWork():
         step14 = step13 & (np.divide(n['array'], g['array']) >= const3)
         step15 = step14 & (np.divide(n['array'], s1['array']) >= const4)
         step16 = step15 & (s1['array'] > self.min3Array(b['array'], g['array'], r['array']))
-        return copy.deepcopy(step16 & (self.ndsi(green, swir1) < const5))
+        return step16 & (self.ndsi(green, swir1) < const5)
 
     def isCloudshape2(self, blue, green, red, nir, swir1, swir2):
         import numpy as np
@@ -806,7 +817,7 @@ class ImageWork():
         step11 = np.fmax(max1, max2) > const1
         step12 = step11 & (np.fmin(self.min3Array(b['array'], g['array'], r['array']), n['array']) > const2)
         step13 = step12 & (self.isSnowshape(blue, green, red, nir, swir1) is False)
-        return copy.deepcopy(step13 & (self.isBrightsoil(blue, green, red, nir, swir1, swir2) is False))
+        return step13 & (self.isBrightsoil(blue, green, red, nir, swir1, swir2) is False)
 
     def isCloudshape3(self, blue, green, red, nir, swir1, swir2):
         import numpy as np
@@ -830,22 +841,12 @@ class ImageWork():
         step14 = step13 & (self.max3Array(g['array'], r['array'], n['array']) >= const4)
         step15 = step14 & (self.isSnowshape(blue, green, red, nir, swir1) is False)
         step16 = step15 & (self.ndsi(green, swir1) > const5)
-        return copy.deepcopy(step16 & (self.isBrightsoil(blue, green, red, nir, swir1, swir2) is False))
+        return step16 & (self.isBrightsoil(blue, green, red, nir, swir1, swir2) is False)
 
     def isCloudshape(self, blue, green, red, nir, swir1, swir2):
         import copy
         import numpy as np
-        return copy.deepcopy(
-            np.logical_or
-                (
-                np.logical_or
-                    (
-                    self.isCloudshape1(blue, green, red, nir, swir1),
-                    self.isCloudshape2(blue, green, red, nir, swir1, swir2)
-                ),
-                self.isCloudshape3(blue, green, red, nir, swir1, swir2)
-            )
-        )
+        return np.logical_or(np.logical_or(self.isCloudshape1(blue, green, red, nir, swir1),self.isCloudshape2(blue, green, red, nir, swir1, swir2)),self.isCloudshape3(blue, green, red, nir, swir1, swir2))
 
     def isDWAT1(self, blue, green, red, nir, swir1, swir2):
         import numpy as np
@@ -871,7 +872,7 @@ class ImageWork():
         step22 = step21 & (g['array'] >= const3)
         step23 = step22 & (g['array'] <= const4)
         step24 = step23 & (np.fmax(s1['array'], s2['array']) <= const3)
-        return copy.deepcopy(step24)
+        return step24
 
     def isSWAT1(self, blue, red, nir, swir1, swir2):
         import numpy as np
@@ -888,7 +889,7 @@ class ImageWork():
         step12 = step11 & (r['array'] >= const1)
         step13 = step12 & (r['array'] <= const2)
         step14 = step13 & (b['array'] > const3)
-        return copy.deepcopy(step14 & (np.fmax(s1['array'], s2['array']) < const1))
+        return step14 & (np.fmax(s1['array'], s2['array']) < const1)
 
     def isSWAT2(self, blue, green, red, nir, swir1, swir2):
         import numpy as np
@@ -917,7 +918,7 @@ class ImageWork():
         const5 = 0.058
         step31 = b['array'] > const4
         step32 = step31 & (np.fmax(s1['array'], s2['array']) < const5)
-        return copy.deepcopy(isWatershape2 & step32)
+        return isWatershape2 & step32
 
     def isCl1(self, blue, green, red, nir):
         import numpy as np
@@ -930,7 +931,7 @@ class ImageWork():
         step11 = b['array'] > const1
         step12 = step11 & (g['array'] > const1)
         step13 = step12 & (r['array'] > const1)
-        return copy.deepcopy(step13 & (n['array'] > const1))
+        return step13 & (n['array'] > const1)
 
     def isCl2(self, blue, green, red, nir):
         import numpy as np
@@ -944,7 +945,7 @@ class ImageWork():
         step11 = b['array'] > g['array']
         step12 = step11 & (b['array'] > r['array'])
         step13 = step12 & (n['array'] > const1)
-        return copy.deepcopy(step13 & (b['array'] > const2))
+        return step13 & (b['array'] > const2)
 
     def isCl3(self, blue, green, red, nir):
         import numpy as np
@@ -961,7 +962,7 @@ class ImageWork():
         step12 = step11 & (b['array'] > const1)
         step13 = step12 & (g['array'] > const2)
         step14 = step13 & (np.abs(np.subtract(r['array'], g['array'])) <= const3)
-        return copy.deepcopy(step14 & (n['array'] > const4))
+        return step14 & (n['array'] > const4)
 
     def isSadow1(self, blue, green, red, nir):
         import numpy as np
@@ -977,7 +978,7 @@ class ImageWork():
         step12 = step11 & (b['array'] > g['array'])
         step13 = step12 & (g['array'] > r['array'])
         step14 = step13 & (r['array'] < const2)
-        return copy.deepcopy(step14 & (np.subtract(b['array'], n['array']) < const3))
+        return step14 & (np.subtract(b['array'], n['array']) < const3)
 
 
 

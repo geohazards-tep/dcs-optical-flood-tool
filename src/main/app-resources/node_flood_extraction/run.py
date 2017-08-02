@@ -9,8 +9,10 @@
 
 import subprocess
 import os,sys
+os.environ['GDAL_DATA'] = '/opt/anaconda/share/gdal/'
 import cioppy
 import string
+import glob
 #sys.path.append('./util/')
 
 import water_OpticalSat_detection
@@ -43,7 +45,7 @@ def main():
     print "tmpdir: ", outdir
     try:
     	input_file = input[0][string.find(input[0], "'")+1:string.rfind(input[0],"'")].strip()    
-	local_file = ciop.copy(input_file, outdir)
+	local_file = ciop.copy(input_file, outdir, extract=False)
 	print 'result of ciop.copy: ', local_file
 	print "input file: ", input_file
         print "outdir: ", outdir
@@ -52,46 +54,76 @@ def main():
 	print "filename: ", filename
         if 'tar.gz' in filename:
 	    print 'tar.gz'
-	    tmpdir=os.path.splitext(os.path.splitext(filename)[0])[0]
+	    if (os.path.basename(filename)[0:3] == "S2A"):
+		tmpdir=''
+	    elif (os.path.basename(filename)[0:3] == "LC8"): 		
+		tmpdir=os.path.splitext(os.path.splitext(filename)[0])[0]
 	    print tmpdir
 	    extract_dir=outdir+os.sep+tmpdir
 	    print "extract_dir: ", extract_dir
             subprocess.call(["ls","-l",local_file])
-	    os.mkdir(extract_dir)
+	    if (os.path.basename(filename)[0:3] == "LC8"):
+                os.mkdir(extract_dir)
+
 	    subprocess.call(["tar","xzf",local_file,"-C",extract_dir])
 	elif 'zip' in filename:
 	    print 'zip'
-	    tmpdir=os.path.splitext(filename)[0]
+            if (os.path.basename(filename)[0:3] == "S2A"):
+                tmpdir=''
+            elif (os.path.basename(filename)[0:3] == "LC8"):
+                tmpdir=os.path.splitext(filename)[0]
 	    print tmpdir
 	    extract_dir=outdir+os.sep+tmpdir
 	    print "extract_dir: ", extract_dir
             subprocess.call(["ls","-l",local_file])
-	    os.mkdir(extract_dir)
+	    if (os.path.basename(filename)[0:3] == "LC8"):
+		os.mkdir(extract_dir)
 	    subprocess.call(["unzip",local_file,"-d",extract_dir])
         elif 'tar.bz' in filename:
 	    print 'tar.bz'
-            tmpdir=os.path.splitext(os.path.splitext(filename)[0])[0]
+            if (os.path.basename(filename)[0:3] == "S2A"):
+                tmpdir=''
+            elif (os.path.basename(filename)[0:3] == "LC8"):
+                tmpdir=os.path.splitext(os.path.splitext(filename)[0])[0]
+	
             print tmpdir
 	    extract_dir=outdir+os.sep+tmpdir
             print "extract_dir: ", extract_dir
 	    subprocess.call(["ls","-l",local_file])
-	    os.mkdir(extract_dir)
+            if (os.path.basename(filename)[0:3] == "LC8"):
+                os.mkdir(extract_dir)
+
             subprocess.call(["tar","xjf",local_file,"-C",extract_dir])
     except:
  	print "flood_extraction: unexpected error...", sys.exc_info()[0]
         return 15     
     
-
-    subprocess.call(["ls","-l",extract_dir])
+    if (os.path.basename(filename)[0:3] == "S2A"):
+	extract_dir=extract_dir+os.sep+os.path.basename(filename)[0:60]+'.SAFE'
+    elif (os.path.basename(filename)[0:3] == "LC8"):
+	pass
+    print "extract dir: ", extract_dir
+    #subprocess.call(["ls","-l",extract_dir])
 
     #flood_file_result = water_OpticalSat_detection.water_OpticalSat_detection_body(image_folder=extract_dir, type_sat=None, outdir=extract_dir, smallest_flood_pixels=9, proc_param='8 8 0.20 0.25')
+    print os.listdir(extract_dir)
     sensor_init = filename[0:3].upper()
     sensor_map = {'S2A':'S2R','LC8':'L8R'}
     param_sat = {'S2A':'8 8 0.20 0.25','LC8':'5 5 0.14 0.14'}
-    print "water detection parameter: ", extract_dir, sensor_map[sensor_init], extract_dir
+    print "water detection parameter: ", extract_dir, sensor_map[sensor_init]
     print "param_sat: ", param_sat[sensor_init]
     flood_file_result = water_OpticalSat_detection.water_OpticalSat_detection_body(image_folder=extract_dir, type_sat=sensor_map[sensor_init], outdir=extract_dir, smallest_flood_pixels=9, proc_param=param_sat[sensor_init])
-
+    
+    ###output name fixing
+    if (os.path.basename(filename)[0:3] == "S2A"):
+        new_file_name=extract_dir+os.sep+os.path.basename(filename)[0:60]+'_WaterMask.tif'
+	print new_file_name
+	os.rename(flood_file_result, new_file_name)
+	flood_file_result = new_file_name
+    elif (os.path.basename(filename)[0:3] == "LC8"):
+        pass
+	
+    
     #water_OpticalSat_detection --image_folder lista_immagini.txt --type_sat 'S2R' --window 'xmin ymin xdim ydim' --outdir=./ --proc_param='8 8 0.20 0.25'
     print "flood_file_result: ", flood_file_result
     ciop.publish(flood_file_result, metalink=True)
