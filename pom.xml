@@ -11,7 +11,7 @@
     <version>2.0.0</version>
   </parent>
   <description>This application will extract a series of flood extent maps from a stack of optical data (SENTINEL-2 and LANDSAT-8)</description>
-  <version>1.2</version>
+  <version>1.3-SNAPSHOT</version>
   <properties>
     <summary>flood extraction from optical images</summary>
     <description>This application will extract a series of flood extent maps from a stack of optical data (SENTINEL-2 and LANDSAT-8)</description>
