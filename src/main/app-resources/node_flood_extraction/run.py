@@ -13,6 +13,7 @@ os.environ['GDAL_DATA'] = '/opt/anaconda/share/gdal/'
 import cioppy
 import string
 import glob
+import datetime
 #sys.path.append('./util/')
 
 import water_OpticalSat_detection
@@ -120,15 +121,23 @@ def main():
 	print new_file_name
 	os.rename(flood_file_result, new_file_name)
 	flood_file_result = new_file_name
+	analysis_date = datetime.date(int(os.path.basename(flood_file_result)[11:15]), int(os.path.basename(flood_file_result)[15:17]), int(os.path.basename(flood_file_result)[17:19]))
     elif (os.path.basename(filename)[0:3] == "LC8"):
+	analysis_date = datetime.date(int(os.path.basename(flood_file_result)[9:13]), 1, 1)+datetime.timedelta(int(os.path.basename(flood_file_result)[13:16]))
         pass
 	
     
     #water_OpticalSat_detection --image_folder lista_immagini.txt --type_sat 'S2R' --window 'xmin ymin xdim ydim' --outdir=./ --proc_param='8 8 0.20 0.25'
     print "flood_file_result: ", flood_file_result
     ciop.publish(flood_file_result, metalink=True)
-   
-   
+    outfile_properties = flood_file_result.replace("tif","properties")
+    file_properties=open(outfile_properties, "w")
+    file_properties.write("date="+datetime.datetime.now().isoformat()+'\n')
+    file_properties.write("output="+os.path.basename(flood_file_result)+'\n')
+    file_properties.write('title=Water map extent relative to the situation of '+analysis_date.isoformat()+'\n')
+    file_properties.write("copyrigth=e-Geos")
+    file_properties.close()
+    ciop.publish(outfile_properties, metalink=True)
     
     
     #estrazione nome directory dove estrarre il file

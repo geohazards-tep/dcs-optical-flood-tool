@@ -11,7 +11,7 @@ class ImageWork():
         else:
             print 'Error in satTyp. Usable SatTypes are "S2R" or "L8R"'
             return
-        self.noData = 999999999
+        self.noData = 0 
 
     def noDataToNan(self, imageDict, npType='float32'):
         import numpy as np
