@@ -20,7 +20,7 @@
         </defaultJobconf>
     </jobTemplate>
   </jobTemplates>
-    <workflow id="optical-flood-extraction" title="optical flood extraction" abstract="this workflow will download the selected data from the interface and  perform the flood extraction from Optical data">
+    <workflow id="optical-flood-extraction" title="optical flood extraction" abstract="Service using Sentinel-2 and Landsat-8 data and an automated Water Extraction tool developed and integrated in GEP by eGEOS to extract water bodies to support flood mapping.">
     <workflowVersion>1.0</workflowVersion>
     <node id="node_download">       
       <job id="download"></job>
